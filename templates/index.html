@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lapbook de conceptos web</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&family=Nunito:wght@400;700&family=Fira+Code&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/estilos.css') }}">
+</head>
+<body>
+  <header class="portada">
+    <h1>Lapbook web</h1>
+    <p>Abre las solapas de cada tema para descubrir qué es, de qué está hecho y para qué sirve.</p>
+    <div class="controles">
+      <button id="abrirTodo" type="button">Abrir todas</button>
+      <button id="cerrarTodo" type="button">Cerrar todas</button>
+      <span class="progreso" aria-live="polite">Descubiertas: <b id="contador">0</b> / <span id="total">0</span></span>
+    </div>
+    <div class="barra"><div id="barraRelleno"></div></div>
+  </header>
+
+  <nav class="pestanas" role="tablist" aria-label="Temas">
+    {% for t in temas %}
+    <button role="tab" class="pestana{% if loop.first %} activa{% endif %}" data-tema="{{ t.id }}" aria-selected="{{ 'true' if loop.first else 'false' }}">{{ t.nombre }}</button>
+    {% endfor %}
+  </nav>
+
+  <main>
+    {% for t in temas %}
+    <section class="tema{% if loop.first %} visible{% endif %}" id="tema-{{ t.id }}" role="tabpanel">
+      <div class="tema-cabeza">
+        <h2>{{ t.nombre }}</h2>
+        <p>{{ t.lema }}</p>
+      </div>
+      <div class="solapas">
+        {% for clave, titulo in flaps %}
+        <article class="solapa">
+          <button class="solapa-btn" type="button" aria-expanded="false">
+            <span>{{ titulo }}</span><i aria-hidden="true"></i>
+          </button>
+          <div class="solapa-cuerpo"><div class="solapa-interior">
+            {% set v = t[clave] %}
+            {% if v is string %}
+              {% if clave == 'ejemplo' %}
+                <pre><code>{{ v }}</code></pre>
+                <button class="copiar" type="button">Copiar código</button>
+              {% else %}
+                <p>{{ v }}</p>
+              {% endif %}
+            {% else %}
+              <ul>{% for item in v %}<li>{{ item }}</li>{% endfor %}</ul>
+            {% endif %}
+          </div></div>
+        </article>
+        {% endfor %}
+      </div>
+    </section>
+    {% endfor %}
+
+    <section class="quiz" id="quiz">
+      <h2>Reto rápido</h2>
+      <p id="pregunta"></p>
+      <div id="opciones"></div>
+      <p id="resultado" aria-live="polite"></p>
+      <button id="siguiente" type="button">Otra pregunta</button>
+    </section>
+  </main>
+
+  <footer>Hecho con Flask, Jinja, HTML, CSS, JavaScript y un poco de SQL.</footer>
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
